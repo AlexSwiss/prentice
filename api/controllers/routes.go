@@ -9,6 +9,7 @@ func (s *Server) initializeRoutes() {
 
 	// Login Route
 	s.Router.HandleFunc("/login", middlewares.SetMiddlewareJSON(s.Login)).Methods("POST")
+	s.Router.HandleFunc("/shop/login", middlewares.SetMiddlewareJSON(s.ShopLogin)).Methods("POST")
 
 	//Users routes
 	s.Router.HandleFunc("/users", middlewares.SetMiddlewareJSON(s.CreateUser)).Methods("POST")
@@ -18,9 +19,9 @@ func (s *Server) initializeRoutes() {
 	s.Router.HandleFunc("/users/{id}", middlewares.SetMiddlewareAuthentication(s.DeleteUser)).Methods("DELETE")
 
 	//Posts routes
-	s.Router.HandleFunc("/Shops", middlewares.SetMiddlewareJSON(s.CreateShop)).Methods("POST")
-	s.Router.HandleFunc("/shops", middlewares.SetMiddlewareJSON(s.GetShop)).Methods("GET")
-	s.Router.HandleFunc("/Shops/{id}", middlewares.SetMiddlewareJSON(s.GetShop)).Methods("GET")
+	s.Router.HandleFunc("/shops", middlewares.SetMiddlewareJSON(s.CreateShop)).Methods("POST")
+	s.Router.HandleFunc("/shops", middlewares.SetMiddlewareJSON(s.GetShops)).Methods("GET")
+	s.Router.HandleFunc("/shops/{id}", middlewares.SetMiddlewareJSON(s.GetShop)).Methods("GET")
 	s.Router.HandleFunc("/shops/{id}", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareAuthentication(s.UpdateShop))).Methods("PUT")
 	s.Router.HandleFunc("/shops/{id}", middlewares.SetMiddlewareAuthentication(s.DeleteShop)).Methods("DELETE")
 }

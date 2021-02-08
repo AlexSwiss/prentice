@@ -13,7 +13,7 @@ import (
 )
 
 // Login takes inputs and logs user in
-func (server *Server) LoginShop(w http.ResponseWriter, r *http.Request) {
+func (server *Server) ShopLogin(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
@@ -32,7 +32,7 @@ func (server *Server) LoginShop(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	token, err := server.SignIn(shop.AdminEmail, shop.Password)
+	token, err := server.ShopSignIn(shop.AdminEmail, shop.Password)
 	if err != nil {
 		formattedError := formaterror.FormatError(err.Error())
 		responses.ERROR(w, http.StatusUnprocessableEntity, formattedError)
@@ -42,17 +42,17 @@ func (server *Server) LoginShop(w http.ResponseWriter, r *http.Request) {
 }
 
 //SignIn validates email and password
-func (server *Server) SignInShop(adminemail, password string) (string, error) {
+func (server *Server) ShopSignIn(admin_email, password string) (string, error) {
 
 	var err error
 
 	shop := models.Shop{}
 
-	err = server.DB.Debug().Model(models.Shop{}).Where("adminemail = ?", adminemail).Take(&shop).Error
+	err = server.DB.Debug().Model(models.Shop{}).Where("admin_email = ?", admin_email).Take(&shop).Error
 	if err != nil {
 		return "", err
 	}
-	err = models.VerifyPassword(shop.Password, password)
+	err = models.VerifyPasswordShop(shop.Password, password)
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
 		return "", err
 	}

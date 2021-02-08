@@ -22,19 +22,19 @@ func (server *Server) CreateShop(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 	}
-	user := models.User{}
-	err = json.Unmarshal(body, &user)
+	shop := models.Shop{}
+	err = json.Unmarshal(body, &shop)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	user.Prepare()
-	err = user.Validate("")
+	shop.Prepare()
+	err = shop.Validate("")
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	userCreated, err := user.SaveUser(server.DB)
+	userCreated, err := shop.SaveShop(server.DB)
 
 	if err != nil {
 
@@ -50,14 +50,14 @@ func (server *Server) CreateShop(w http.ResponseWriter, r *http.Request) {
 // GetUsers function returns all users
 func (server *Server) GetShops(w http.ResponseWriter, r *http.Request) {
 
-	user := models.User{}
+	shop := models.Shop{}
 
-	users, err := user.FindAllUsers(server.DB)
+	shops, err := shop.FindAllShops(server.DB)
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
-	responses.JSON(w, http.StatusOK, users)
+	responses.JSON(w, http.StatusOK, shops)
 }
 
 // GetUser returns single user
@@ -69,13 +69,13 @@ func (server *Server) GetShop(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	user := models.User{}
-	userGotten, err := user.FindUserByID(server.DB, uint32(uid))
+	shop := models.Shop{}
+	shopGotten, err := shop.FindShopByID(server.DB, uint32(uid))
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
-	responses.JSON(w, http.StatusOK, userGotten)
+	responses.JSON(w, http.StatusOK, shopGotten)
 }
 
 // UpdateUser edits user in db
@@ -92,8 +92,8 @@ func (server *Server) UpdateShop(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	user := models.User{}
-	err = json.Unmarshal(body, &user)
+	shop := models.Shop{}
+	err = json.Unmarshal(body, &shop)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
@@ -107,19 +107,19 @@ func (server *Server) UpdateShop(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusUnauthorized, errors.New(http.StatusText(http.StatusUnauthorized)))
 		return
 	}
-	user.Prepare()
-	err = user.Validate("update")
+	shop.Prepare()
+	err = shop.Validate("update")
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	updatedUser, err := user.UpdateAUser(server.DB, uint32(uid))
+	updatedShop, err := shop.UpdateAShop(server.DB, uint32(uid))
 	if err != nil {
 		formattedError := formaterror.FormatError(err.Error())
 		responses.ERROR(w, http.StatusInternalServerError, formattedError)
 		return
 	}
-	responses.JSON(w, http.StatusOK, updatedUser)
+	responses.JSON(w, http.StatusOK, updatedShop)
 }
 
 // DeleteUser removes user from db
@@ -127,7 +127,7 @@ func (server *Server) DeleteShop(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 
-	user := models.User{}
+	shop := models.Shop{}
 
 	uid, err := strconv.ParseUint(vars["id"], 10, 32)
 	if err != nil {
@@ -143,7 +143,7 @@ func (server *Server) DeleteShop(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusUnauthorized, errors.New(http.StatusText(http.StatusUnauthorized)))
 		return
 	}
-	_, err = user.DeleteAUser(server.DB, uint32(uid))
+	_, err = shop.DeleteAShop(server.DB, uint32(uid))
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)
 		return

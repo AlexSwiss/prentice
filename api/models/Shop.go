@@ -15,11 +15,11 @@ import (
 // User repesent the structure of each user
 type Shop struct {
 	ID          uint32    `gorm:"primary_key;auto_increment" json:"id"`
-	AdminName   string    `gorm:"size:255;not null;unique" json:"adminname"`
-	AdminEmail  string    `gorm:"size:100;not null;unique" json:"adminemail"`
-	ShopName    string    `gorm:"size:100;not null;unique" json:"shopname"`
+	AdminName   string    `gorm:"size:255;not null;unique" json:"admin_name"`
+	AdminEmail  string    `gorm:"size:100;not null;unique" json:"admin_email"`
+	ShopName    string    `gorm:"size:100;not null;unique" json:"shop_name"`
 	Stack       string    `gorm:"size:100;not null;unique" json:"stack"`
-	TeamMembers string    `gorm:"size:100;not null;unique" json:"teammembers"`
+	TeamMembers string    `gorm:"size:100;not null;unique" json:"team_members"`
 	Bio         string    `gorm:"size:100;not null;unique" json:"bio"`
 	Password    string    `gorm:"size:100;not null;" json:"password"`
 	CreatedAt   time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
@@ -38,7 +38,7 @@ func VerifyPasswordShop(hashedPassword, password string) error {
 
 //BeforeSave function creates a hash of the password
 func (u *Shop) BeforeSave() error {
-	hashedPassword, err := Hash(u.Password)
+	hashedPassword, err := HashShop(u.Password)
 	if err != nil {
 		return err
 	}
@@ -90,12 +90,14 @@ func (u *Shop) Validate(action string) error {
 
 		return nil
 	case "login":
-		if u.Password == "" {
-			return errors.New("Required Password")
-		}
 		if u.AdminEmail == "" {
 			return errors.New("Required Email")
 		}
+
+		if u.Password == "" {
+			return errors.New("Required Password")
+		}
+
 		if err := checkmail.ValidateFormat(u.AdminEmail); err != nil {
 			return errors.New("Invalid Email")
 		}
@@ -103,7 +105,7 @@ func (u *Shop) Validate(action string) error {
 
 	default:
 		if u.AdminName == "" {
-			return errors.New("Required Admin name")
+			return errors.New("Required Adminname")
 		}
 		if u.ShopName == "" {
 			return errors.New("Required Shop name")
@@ -142,7 +144,7 @@ func (u *Shop) SaveShop(db *gorm.DB) (*Shop, error) {
 }
 
 // FindAllUsers function returns all users in db
-func (u *Shop) FindAllShop(db *gorm.DB) (*[]Shop, error) {
+func (u *Shop) FindAllShops(db *gorm.DB) (*[]Shop, error) {
 	var err error
 	shops := []Shop{}
 	err = db.Debug().Model(&Shop{}).Limit(100).Find(&shops).Error
@@ -175,14 +177,14 @@ func (u *Shop) UpdateAShop(db *gorm.DB, uid uint32) (*Shop, error) {
 	}
 	db = db.Debug().Model(&Shop{}).Where("id = ?", uid).Take(&Shop{}).UpdateColumns(
 		map[string]interface{}{
-			"password":    u.Password,
-			"adminname":   u.AdminName,
-			"adminemail":  u.AdminEmail,
-			"shopname":    u.ShopName,
-			"stack":       u.Stack,
-			"teammembers": u.TeamMembers,
-			"bio":         u.Bio,
-			"update_at":   time.Now(),
+			"password":     u.Password,
+			"admin_name":   u.AdminName,
+			"admin_email":  u.AdminEmail,
+			"shop_name":    u.ShopName,
+			"stack":        u.Stack,
+			"team_members": u.TeamMembers,
+			"bio":          u.Bio,
+			"update_at":    time.Now(),
 		},
 	)
 	if db.Error != nil {
@@ -197,7 +199,7 @@ func (u *Shop) UpdateAShop(db *gorm.DB, uid uint32) (*Shop, error) {
 }
 
 // DeleteAUser function removes a user from the db
-func (u *User) DeleteAShop(db *gorm.DB, uid uint32) (int64, error) {
+func (u *Shop) DeleteAShop(db *gorm.DB, uid uint32) (int64, error) {
 
 	db = db.Debug().Model(&Shop{}).Where("id = ?", uid).Take(&Shop{}).Delete(&Shop{})
 
